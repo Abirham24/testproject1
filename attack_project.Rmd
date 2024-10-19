@@ -1,0 +1,142 @@
+---
+title: "attack_project"
+author: "Abirham Getie"
+date: "2024-10-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ezids)
+library(ggplot2)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+df=read.csv("D:/Githubfordatamining/FA24-DATS6101-11/Project/Global_Terrorism_data_cleaned.csv")
+head(df)
+str(df)
+```
+
+```{r}
+summary(df)
+colSums(is.na(df))
+
+```
+```{r}
+df$Date <- as.Date(paste(df$Year, df$Month, df$Day, sep="-"), "%Y-%m-%d")
+
+```
+```{r}
+summary(df$Killed)
+summary(df$Wounded)
+summary(df$casualities)
+
+```
+```{r}
+library(dplyr)
+
+
+df <- df %>%
+  mutate(Weapon_Type = recode(Weapon_Type,
+                               "Vehicle (not to include vehicle-borne explosives, i.e., car or truck bombs)" = "Vehicle"))
+
+```
+
+```{r}
+ggplot(df, aes(x = AttackType)) + 
+  geom_bar(fill="#69b3a2",color="purple") + 
+  theme_minimal()+
+  labs(title = "Distribution of Attack types",
+       x="Attack type",
+       y="count")+
+  scale_fill_brewer(palette = "Set3") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+ggplot(df, aes(x = Weapon_Type)) +
+  geom_bar(fill="blue",color="purple") +
+  theme_minimal()+
+  labs(title ="Distribution of weapon_Types",
+       x="weapon type",
+       y="count")+
+  scale_fill_brewer(palette = "Set3")+
+  theme(axis.text.x=element_text(angle = 45,hjust = 1))
+
+```
+```{r}
+# Load necessary libraries
+library(corrplot)
+library(dplyr)
+
+
+# Select only numeric columns from the dataframe
+numeric_df <- df %>% select_if(is.numeric)
+
+# Calculate the correlation matrix for the numeric dataframe
+cor_matrix <- cor(numeric_df)
+
+# Create the correlation plot
+corrplot(cor_matrix,
+         method = "color",          # Use color for the correlation coefficient
+         type = "upper",            # Show only the upper triangle
+         addCoef.col = "lightblue",     # Add correlation coefficients in black color
+         number.cex = 0.7,          # Adjust the size of the numbers
+         tl.col = "black",          # Text label color
+         tl.srt = 45,               # Text label rotation
+         diag = FALSE,              # Do not display the diagonal
+         col = colorRampPalette(c("red", "white", "blue"))(200)  # Color gradient for the boxes
+)
+
+# Overlay numbers inside the boxes
+corrplot(cor_matrix,
+         method = "number",         # Display correlation coefficients as numbers
+         type = "upper",            # Show only the upper triangle
+         number.cex = 0.7,          # Adjust the size of the numbers
+         col = "black",              # Number color
+         addCoef.col = "black",      # Ensure numbers are visible
+         diag = FALSE                # Do not display the diagonal
+)
+
+
+
+```
+
+```{r}
+# Load necessary library
+library(corrplot)
+
+# Calculate the correlation matrix for the specified columns
+cor_matrix <- cor(df[, c("Killed", "Wounded", "casualities")])
+
+# Create the correlation plot
+corrplot(cor_matrix,
+         method = "number",   # Display correlation coefficients as numbers
+         type = "upper",      # Show only the upper triangle
+         number.cex = 0.7,    # Adjust the size of the numbers
+         col = colorRampPalette(c("red", "white", "blue"))(200),  # Color gradient
+         tl.col = "black",    # Text label color
+         tl.srt = 45,         # Text label rotation
+         diag = FALSE         # Do not display the diagonal
+)
+
+
+
+```
